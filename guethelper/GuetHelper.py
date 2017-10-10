@@ -5,7 +5,7 @@ import re
 
 
 class GuetHelper:
-    def __init__(self, username: str, password: str):
+    def __init__(self, username: str, password: str) -> None:
         self.username = username
         self.password = password
         self.session = requests.session()
