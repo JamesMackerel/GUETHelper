@@ -1,6 +1,12 @@
 # GUETHelper
 桂林电子科技大学学生选课系统功能的Python封装
 
+# 依赖
+Python >= 3.6
+BeautifulSoup
+requests
+
+# 功能
 已经实现的功能：
 1. 登录
 2. 获取已选课程列表
