@@ -38,6 +38,9 @@ class GuetHelper:
         self.student_info['grade'] = info_page[3].string.split(':')[1]
         self.student_info['term'] = info_page[4].string.split(':')[1]
 
+    def logout(self) -> None:
+        self.session.get('http://bkjw.guet.edu.cn/student/public/logout.asp')
+
     def get_selected_lesson(self, term: str) -> Union[None, Tuple[List[str], List[List[str]]]]:
         """
         获取已选课程列表
