@@ -116,6 +116,32 @@ class GuetHelper:
 
         return score_headers, score_data, interest_credit
 
+    def get_earned_credit(self) -> Union[None, Tuple[List[str], List[List[str]]]]:
+        """
+        对应“已取得学分”页面
+        :return:
+            返回两个List。第一个List保存了表格的头部；第二个List包含若干个List，其中每一个List代表表格中的一行数据。
+            若未登录，则返回None.
+        """
+        if self.login_status is False:
+            return None
 
-if __name__ == '__main__':
-    pass
+        page = self.session.get('http://bkjw.guet.edu.cn/student/credits.asp')
+        data_rows = BeautifulSoup(page.content, 'html.parser').find_all('table')[-1].find_all('tr')
+        th = data_rows[0]
+        data = data_rows[1:-1]
+
+        credit_headers: List[str] = list()
+        credit_data: List[List['str']] = list()
+
+        for h in th:
+            credit_headers.append(h.string)
+
+        tmp_data = list()
+        for d in data:
+            tmp_data.clear()
+            for col in d.find_all("td"):
+                tmp_data.append(col.string.encode().decode())
+            credit_data.append(tmp_data.copy())
+
+        return credit_headers, credit_data
