@@ -12,6 +12,16 @@ class GuetHelper:
         self.student_info: Dict[str, str] = dict()
         self.login_status = False
 
+    root_url = "http://172.16.64.236/"
+
+    sub_url_tab = {
+        "url_login": "student/public/login.asp",
+        "url_info": "student/Info.asp",
+        "url_logout": "student/public/logout.asp",
+        "url_courses": "student/Selected.asp",
+        "url_elva": "student/teachinpj.asp",
+    }
+
     def login(self) -> Union[None, bool]:
         """登录教务系统
 
@@ -145,3 +155,34 @@ class GuetHelper:
             credit_data.append(tmp_data.copy())
 
         return credit_headers, credit_data
+
+    def elva_teaching(self):
+        """
+            一键强制评教的实现
+        """
+        header, data = self.get_selected_lesson(self.student_info["term"])
+        cno = list()
+        cid = list()
+        for d in data:
+            cno.append(d[0])       # cno 课程序号
+            cid.append(d[1])       # cid 课程代码
+
+        # for course in course_list:
+        #     payload[] = course.cid
+        #     payload[] = course.cno
+        # 默认全部好评的表单数据
+        payload = "score1027=100&id=1027&qz=.02&score1028=100&id=1028&qz=.03&score1029=100&id=1029&" \
+                  "qz=.12&score1030=100&id=1030&qz=.15&score1031=100&id=1031&qz=.15&score1032=100&id=1032" \
+                  "&qz=.15&score1033=100&id=1033&qz=.05&score1034=100&id=1034&qz=.1&score1035=100&id=1035" \
+                  "&qz=.05&score1036=100&id=1036&qz=.15&score1037=100&id=1037&qz=.02&score1038=100&id=1038" \
+                  "&qz=.01&py=&pjlb=2&gx=i&tno=6357++++++++&lwBtntijiao=%CC%E1%BD%BB&"
+
+        # 设置内容类型 重要
+        self.session.headers["Content-Type"] = "application/x-www-form-urlencoded"
+        # 遍历已选课程评教
+        for i in range(len(cno)):
+            res = self.session.post(self.root_url + self.sub_url_tab["url_elva"],
+                                    data=(payload + "cno=%s&term=%s&cid=%s" % (cno[i], self.student_info['term'], cid[i])))
+            page = BeautifulSoup(res.content, 'html.parser')
+            if page.text.find("已提交") > 0:
+                print("[*] OK")
